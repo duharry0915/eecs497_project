@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>insta485</title>
+  </head>
+  <body>
+    <p>
+      <a href="/">{{"click this"}}</a>
+      <a href="/explore/">{{"explore"}}</a>
+      <a href="/users/{{logname}}/">{{logname}}</a>
+    </p>
+
+    <h1>Discover People</h1>
+    {% for user in users %} {% set flag_follow = namespace(is_following=false)
+    %} {% for follow in log_follows %} {% if user.username == follow.username2
+    %} {% set flag_follow.is_following = true %} {% endif %} {% endfor %} {% if
+    flag_follow.is_following == false %}
+    <img
+      src="/uploads/{{ user.filename }}"
+      alt="{{ user.username }}'s profile picture"
+    />
+    <a href="/users/{{ user.username }}/">{{ user.username }}</a>
+    <form
+      action="/following/?target=/users/{{user_url_slug}}/"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <input type="submit" name="follow" value="follow" />
+      <input
+        type="hidden"
+        name="username"
+        value="/following/?target=/users/{{user_url_slug}}/"
+      />
+      <input type="hidden" name="operation" value="follow" />
+    </form>
+    {% endif %} {% endfor %}
+  </body>
+</html>

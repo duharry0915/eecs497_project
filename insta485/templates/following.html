@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>insta485</title>
+  </head>
+  <body>
+    <p>
+      <a href="/">{{"click this"}}</a>
+      <a href="/explore/">{{"explore"}}</a>
+      <a href="/users/{{logname}}/">{{logname}}</a>
+    </p>
+    <h1>Following</h1>
+			{% for follow in following %}
+        {% if logname == follow.username2 %}
+          {% for user in users %} 
+            {% if user.username == follow.username2 %}
+            <img src="/uploads/{{ user.filename }}" alt="{{ user.filename }}"/>
+            <a href="/users/{{ user.username }}/">{{ user.username }}</a>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for user in users %} 
+            {% if user.username == follow.username2 %}
+              <img src="/uploads/{{ user.filename }}" alt="{{ user.filename }}"/>
+              <a href="/users/{{ user.username }}/">{{ user.username }}</a>
+              {% set flag_follow = namespace(is_following=false) %}
+              {% for all_follow in all_following %}
+                {% if all_follow.username1 == logname and all_follow.username2 == user.username %}
+                  {% set flag_follow.is_following = true %}
+                {% endif %}
+              {% endfor %}
+              {% if flag_follow.is_following == false %}
+                {{"not following"}}
+                <form action="/following/?target=/users/{{user_url_slug}}/" method="post" enctype="multipart/form-data">
+                  <input type="submit" name="follow" value="follow"/>
+                  <input type="hidden" name="username" value="{{user_url_slug}}"/>
+                  <input type="hidden" name="operation" value="follow"/>
+                </form>
+              {% else %}
+                {{"following"}}
+                <form action="/following/?target=/users/{{user_url_slug}}/" method="post" enctype="multipart/form-data">
+                  <input type="submit" name="unfollow" value="unfollow"/>
+                  <input type="hidden" name="username" value="{{user_url_slug}}"/>
+                  <input type="hidden" name="operation" value="unfollow"/>
+                </form>
+              {% endif %}         
+            {% endif %} 
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+  </body>
+</html>

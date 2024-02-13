@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>insta485</title>
+	</head>
+	<body>
+    <p>
+      <a href="/">{{"click this"}}</a>
+		  <a href="/explore/">{{"explore"}}</a>
+		  <a href="/users/{{logname}}/">{{logname}}</a>
+    </p>
+		<div id="reactEntry">
+      Loading ...
+    </div>
+    <!-- Load JavaScript -->
+    <script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+	</body>
+</html>
