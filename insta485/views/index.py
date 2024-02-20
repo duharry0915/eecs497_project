@@ -90,7 +90,7 @@ def like_or_unlike():
     target = request.args.get('target', '/')
     if operation == 'like':
         existing_like = connection.execute(
-            "SELECT 1 FROM likes WHERE owner = ? AND postid = ?",
+            "SELECT * FROM likes WHERE owner = ? AND postid = ?",
             (username, postid)
             ).fetchone()
         if existing_like is None:
@@ -102,7 +102,7 @@ def like_or_unlike():
             flask.abort(409)
     elif operation == 'unlike':
         existing_unlike = connection.execute(
-            "SELECT 1 FROM likes WHERE owner = ? AND postid = ?",
+            "SELECT * FROM likes WHERE owner = ? AND postid = ?",
             (username, postid)
         ).fetchone()
         if existing_unlike is not None:
@@ -137,7 +137,7 @@ def add_comment():
     elif operation == 'delete':
         commentid = flask.request.form['commentid']
         comment_owner = connection.execute(
-            "SELECT owner FROM comments WHERE  commentid = ? ",
+            "SELECT owner FROM comments WHERE commentid = ? ",
             (commentid, )
         ).fetchone()
         if comment_owner['owner'] == username:
@@ -280,7 +280,6 @@ def login():
         "SELECT * FROM users WHERE username = ? AND password = ?",
         (username, password)
     ).fetchone()
-    print(authentication)
     if not authentication:
         flask.abort(403)
     flask.session['username'] = username
