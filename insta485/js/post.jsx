@@ -98,7 +98,6 @@ export default function Post({ url }) {
 
   const handleCommentSubmit = (event) => {
     event.preventDefault();
-    //setCommentText(commentEntry);
     setCommentEntry("");
     fetch("/api/v1/comments/?postid=" + postid, {
       credentials: "same-origin" , method: 'POST',
@@ -139,8 +138,6 @@ export default function Post({ url }) {
         {postid && <form data-testid="comment-form" onSubmit={handleCommentSubmit} >
           <label><input type="text" value = {commentEntry} onChange={handleCommentChange} /></label>
         </form>}
-        {commentText && owner && ownerShowUrl && <span data-testid="comment-text" >{<a href={ownerShowUrl}>{owner}</a>}{commentText}
-        </span>}
       </div>
     </div>
   );
