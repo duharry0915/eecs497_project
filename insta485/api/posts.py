@@ -172,7 +172,7 @@ def get_post(postid_url_slug):
             "url": "/api/v1/comments/" + str(comment["commentid"]) + '/'
         })
     comments_url = "/api/v1/comments/?postid=" + str(postid_url_slug)
-    created = ""
+    created = post['created']
     img_url = "/uploads/" + post['filename']
     logname_likes = False
     log_like_id = None
