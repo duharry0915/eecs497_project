@@ -35,12 +35,12 @@ def add_a_comment():
         "SELECT last_insert_rowid() FROM comments"
     )
     new_inserted_comment_id = cur.fetchone()
-    context = {"commentid": new_inserted_comment_id,
+    context = {"commentid": str(list(new_inserted_comment_id.values())[0]),
             "lognameOwnsThis": True,
             "owner": username,
             "ownerShowUrl": "/users/" + username + '/',
             "text": text,
-            "url": "/api/v1/comments/" + str(new_inserted_comment_id) + '/'}
+            "url": "/api/v1/comments/" + str(list(new_inserted_comment_id.values())[0]) + '/'}
     return flask.jsonify(**context), 201
 
 @insta485.app.route('/api/v1/comments/<commentid>/', methods = ['DELETE'])
