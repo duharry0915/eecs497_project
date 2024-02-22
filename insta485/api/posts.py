@@ -155,9 +155,10 @@ def get_post(postid_url_slug):
         "SELECT * "
         "FROM users "
         "WHERE username == ?",
-        (username,)
+        (post['owner'],)
     )
-    user = cur.fetchone()
+    post_owner = cur.fetchone()
+
     comm_results = []
     for comment in comments:
         logname_owns = False
@@ -172,7 +173,7 @@ def get_post(postid_url_slug):
             "url": "/api/v1/comments/" + str(comment["commentid"]) + '/'
         })
     comments_url = "/api/v1/comments/?postid=" + str(postid_url_slug)
-    created = post['created']
+    created = post["created"]
     img_url = "/uploads/" + post['filename']
     logname_likes = False
     log_like_id = None
@@ -195,8 +196,8 @@ def get_post(postid_url_slug):
                "imgUrl": img_url, 
                "likes": like_results,
                "owner": post['owner'],
-               "ownerImgUrl": "/uploads/" + user['filename'],
-               "ownerShowUrl": "/users/" + username + '/',
+               "ownerImgUrl": "/uploads/" + post_owner['filename'],
+               "ownerShowUrl": "/users/" + post_owner['username'] + '/',
                "postShowUrl": f"/posts/{postid_url_slug}/",
                "postid": postid_url_slug,
                "url": flask.request.path}
