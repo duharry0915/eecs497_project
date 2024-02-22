@@ -60,7 +60,7 @@ def delete_a_comment(commentid):
         username = flask.session['username']
     existing_comment = connection.execute(
         "SELECT * FROM comments WHERE commentid = ?",
-        (commentid)
+        (commentid,)
         ).fetchone()
     if not existing_comment:
         return flask.jsonify(**context), 404

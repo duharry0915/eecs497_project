@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import utc from 'dayjs/plugin/utc';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
@@ -10,12 +10,33 @@ dayjs.extend(utc);
 // url is a prop for the Post component.
 export default function Post({ url }) {
   /* Display image and post owner of a single post */
-
   const [imgUrl, setImgUrl] = useState("");
   const [owner, setOwner] = useState("");
+  const [ownerImgUrl, setOwnerImgUrl] = useState("");
+  const [ownerShowUrl, setOwnerShowUrl] = useState("");
+  const [postShowUrl, setPostShowUrl] = useState("");
+  const [comments, setComments] = useState([{}]);
+  const [likes, setLikes] = useState({});
   const [created, setCreated] = useState("");
-  const [likes, setLikes] = useState(0); 
-  const [isLiked, setIsLiked] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [commentEntry, setCommentEntry] = useState("");
+  const [postid, setPostId] = useState(0);
+
+  const commentItems = comments.map(comment =>
+    comment.text && comment.ownerShowUrl && comment.owner && comment.commentid && <div
+      key={comment.commentid}
+    >
+      <a href={comment.ownerShowUrl}>{comment.owner}</a>
+      <span data-testid="comment-text">{comment.text}</span>
+      {comment.lognameOwnsThis && comment.commentid && (
+            <button data-testid="delete-comment-button" onClick={() => handleDeleteComment(comment.commentid)}>
+              Delete comment
+            </button>
+        )}
+    </div>
+  );
+  
+  const likeText = likes['numLikes'] === 1 ? ' like' : ' likes';
 
   useEffect(() => {
     // Declare a boolean flag that we can use to cancel the API request.
@@ -33,8 +54,13 @@ export default function Post({ url }) {
         if (!ignoreStaleRequest) {
           setImgUrl(data.imgUrl);
           setOwner(data.owner);
-          const createdTime = dayjs.utc(data.created).local().fromNow();
-          setCreated(createdTime);
+          setOwnerImgUrl(data.ownerImgUrl);
+          setOwnerShowUrl(data.ownerShowUrl);
+          setPostShowUrl(data.postShowUrl);
+          setComments(data.comments);
+          setLikes(data.likes);
+          setCreated(data.created);
+          setPostId(data.postid);
         }
       })
       .catch((error) => console.log(error));
@@ -46,22 +72,76 @@ export default function Post({ url }) {
       ignoreStaleRequest = true;
     };
   }, [url]);
+  const handleDeleteComment = (commentid) =>{
+    fetch('/api/v1/comments/' + commentid +'/', {
+      credentials: "same-origin" , method: 'DELETE',
+    })
+    .then((response) => {
+      if(!response.ok) throw Error(response.statusText);
+      return response.text();
+    })
+    .then(data => {
+      // Handle the data from the server
+      setComments(comments.filter(comment => comment.commentid != commentid));
+      console.log('Comment deleted:', data);
+    })
+    .catch(error => {
+      // Handle any errors that occurred during the fetch
+      console.error('There has been a problem with your fetch operation:', error);
+    });
 
-  const handleLikeClick = () => {
-    setIsLiked(!isLiked);
-    setLikes(isLiked ? likes - 1 : likes + 1);
+  }
+  const handleCommentChange = (event) => {
+    event.preventDefault();
+    setCommentEntry(event.target.value);
+  }
+
+  const handleCommentSubmit = (event) => {
+    event.preventDefault();
+    //setCommentText(commentEntry);
+    setCommentEntry("");
+    fetch("/api/v1/comments/?postid=" + postid, {
+      credentials: "same-origin" , method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', // Specify the content type as JSON
+      },
+      body: JSON.stringify({
+        "text": commentEntry,
+        "postid" : postid
+      })
+    })
+    .then((response) => {
+      if(!response.ok) throw Error(response.statusText);
+      return response.json();
+    })
+    .then(data => {
+      setComments(comments.concat(data));
+    })
+    .catch(error => {
+      // Handle any errors that occurred during the fetch
+      console.error('There has been a problem with your fetch operation:', error);
+    });
 
   };
-
   // Render post image and post owner
   return (
     <div className="post">
-      <img src={imgUrl} alt="post_image" />
-      <p>{owner}</p>
-      <p>{created}</p>
-      <button onClick={handleLikeClick} data-testid="like-unlike-button">
-        {isLiked ? 'Unlike' : 'Like'} {likes}
-      </button>
+      <div>
+        {owner && ownerShowUrl && (<a href={ownerShowUrl}>{owner}</a>)}
+        {owner && ownerShowUrl && ownerImgUrl && (<a href={ownerShowUrl}>{<img src={ownerImgUrl} alt="owner_image" />}</a>)}
+        {created && (<div>{dayjs.utc(created).local().fromNow()}</div>)}
+      </div>
+        {postShowUrl && imgUrl && (<a href={postShowUrl}>{<img src={imgUrl} alt="post_image" />}</a>)}
+      <div>
+        {likes && (<div>{likes['numLikes']}</div>)}
+        {likes && (<div>{likeText}</div>)}
+        {comments && (<div>{commentItems}</div>)}
+        {postid && <form data-testid="comment-form" onSubmit={handleCommentSubmit} >
+          <label><input type="text" value = {commentEntry} onChange={handleCommentChange} /></label>
+        </form>}
+        {commentText && owner && ownerShowUrl && <span data-testid="comment-text" >{<a href={ownerShowUrl}>{owner}</a>}{commentText}
+        </span>}
+      </div>
     </div>
   );
 }
