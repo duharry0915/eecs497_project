@@ -63,6 +63,7 @@ export default function Post({ url }) {
                 <Like 
                     postImgUrl = {post.imgUrl}
                     initiallikeDetail = {post.likes}
+                    // initialLogName = {post.likes.logNameLikesThis}
                     postid = {post.postid}
                 />
                 <Comment 

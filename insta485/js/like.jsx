@@ -2,13 +2,16 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 export default function Like({postImgUrl, initiallikeDetail, postid}) {
+  console.log(initiallikeDetail["lognameLikesThis"]);
   console.log(initiallikeDetail["numLikes"]);
-  const [logLike, setLogLike] = useState(initiallikeDetail["logNameLikesThis"]);
+  console.log(initiallikeDetail["like_url"]);
+  const [logLike, setLogLike] = useState(initiallikeDetail["lognameLikesThis"]);
   const [numLike, setNumLike] = useState(initiallikeDetail['numLikes']);
+  const [likeUrl, setLikeUrl] = useState(initiallikeDetail["url"]);
   const postId = postid;
   const likeText = numLike === 1 ? ' like' : ' likes';
   const handleClickLike=()=>{
-    if(!initiallikeDetail["logNameLikesThis"]){
+    if(!logLike){
       fetch("/api/v1/likes/?postid=" + postId, {
         credentials: "same-origin" , method: 'POST',
         headers: {
@@ -31,7 +34,23 @@ export default function Like({postImgUrl, initiallikeDetail, postid}) {
       });
     }
     else{
-
+      fetch(likeUrl, {
+        credentials: "same-origin" , method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response) => {
+        if(!response.ok) throw Error(response.statusText);
+        return response.text();
+      })
+      .then(data => {
+        setLogLike(logLike=>(!logLike));
+        setNumLike(numLike=>(numLike - 1))
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
     }
   };
   return (
