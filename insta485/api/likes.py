@@ -65,7 +65,7 @@ def delete_a_like(likeid):
         username = flask.session['username']
     existing_like = connection.execute(
         "SELECT * FROM likes WHERE likeid = ?",
-        (likeid)
+        (likeid,)
         ).fetchone()
     if not existing_like:
         return flask.jsonify(**context), 404

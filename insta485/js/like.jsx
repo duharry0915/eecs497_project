@@ -8,6 +8,7 @@ export default function Like({postImgUrl, initiallikeDetail, postid}) {
   const [logLike, setLogLike] = useState(initiallikeDetail["lognameLikesThis"]);
   const [numLike, setNumLike] = useState(initiallikeDetail['numLikes']);
   const [likeUrl, setLikeUrl] = useState(initiallikeDetail["url"]);
+//  const [addLike, setAddLike] = useState(initiallikeDetail);
   const postId = postid;
   const likeText = numLike === 1 ? ' like' : ' likes';
   const handleClickLike=()=>{
@@ -27,7 +28,10 @@ export default function Like({postImgUrl, initiallikeDetail, postid}) {
       })
       .then(data => {
         setLogLike(logLike=>(!logLike));
-        setNumLike(numLike=>(numLike + 1))
+        setNumLike(numLike=>(numLike + 1));
+        //setAddLike(addLike.concat(data));
+        setLikeUrl(data.url);
+
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
@@ -46,13 +50,15 @@ export default function Like({postImgUrl, initiallikeDetail, postid}) {
       })
       .then(data => {
         setLogLike(logLike=>(!logLike));
-        setNumLike(numLike=>(numLike - 1))
+        setNumLike(numLike=>(numLike - 1));
+        setLikeUrl(null);
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
       });
     }
   };
+
   return (
     <div>
       <img src={postImgUrl} alt="post_image" />
