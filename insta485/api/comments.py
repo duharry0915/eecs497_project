@@ -3,6 +3,7 @@ import flask
 import insta485
 from insta485.api.posts import http_auth
 
+
 @insta485.app.route('/api/v1/comments/', methods = ['POST'])
 def add_a_comment():
     """Create one comment for a specific post. Return 201 on success."""
@@ -45,9 +46,9 @@ def add_a_comment():
 
 @insta485.app.route('/api/v1/comments/<commentid>/', methods = ['DELETE'])
 def delete_a_comment(commentid):
-    """Delete one comment"""
-    context = {}
-    connection = insta485.model.get_db()
+    """Delete one comment."""
+    context= {}
+    connection= insta485.model.get_db()
     authentication = None
     username = None
     password = None

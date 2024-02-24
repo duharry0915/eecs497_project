@@ -99,10 +99,7 @@ def get_10_posts():
         url = base_url
     next_url = ''
     if len(posts) >= size:
-        if size * page <= len(posts):
-            next_url = next_url + base_url + "?size=" + str(size) + "&page=" + str(page + 1) + "&postid_lte=" + str(max_postid)
-        else:
-            next_url = next_url + base_url + "?size=" + str(size) + "&page=" + str(page) + "&postid_lte=" + str(max_postid)
+        next_url = next_url + base_url + "?size=" + str(size) + "&page=" + str(page + 1) + "&postid_lte=" + str(max_postid)
     context = {"next": next_url, "results": results, "url": url}
     return flask.jsonify(**context)
 

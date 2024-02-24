@@ -58,10 +58,38 @@ export default function Like({postImgUrl, initiallikeDetail, postid}) {
       });
     }
   };
-
+  const handleDoubleClick = () => {
+    if (!logLike) {
+      fetch("/api/v1/likes/?postid=" + postId, {
+        credentials: "same-origin",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postid: postId,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+        .then((data) => {
+          setLogLike((logLike) => !logLike);
+          setNumLike((numLike) => numLike + 1);
+          setLikeUrl(data.url);
+        })
+        .catch((error) => {
+          console.error(
+            "There has been a problem with your fetch operation:",
+            error,
+          );
+        });
+    }
+  };
   return (
     <div>
-      <img src={postImgUrl} alt="post_image" />
+      <img src={postImgUrl} alt="post_image" onDoubleClick={handleDoubleClick}/>
       <div>{numLike}{likeText}</div>
       <button data-testid="like-unlike-button" onClick = {handleClickLike}>
       {logLike === true ? 'Unlike' : "Like"}

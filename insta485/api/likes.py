@@ -40,7 +40,7 @@ def add_a_like():
         (username, post_id)
         ).fetchone()
         context ={"likeid": existing_like['likeid'] + 1,
-                  "url": "/api/v1/likes/" + str(existing_like['likeid'] + 1) + '/'}
+                  "url": "/api/v1/likes/" + str(existing_like['likeid']) + '/'}
         
         return flask.jsonify(**context), 201
     else:
