@@ -80,5 +80,4 @@ def delete_a_comment(commentid):
             )
         connection.commit()
         return flask.jsonify(**context), 204
-    else:
-        return flask.jsonify(**context), 403
+    return flask.jsonify(**context), 403

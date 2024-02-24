@@ -45,11 +45,10 @@ def add_a_like():
                    "url": "/api/v1/likes/" +
                    str(existing_like['likeid']) + '/'}
         return flask.jsonify(**context), 201
-    else:
-        context = {"likeid": existing_like['likeid'],
-                   "url": "/api/v1/likes/" +
-                   str(existing_like['likeid']) + '/'}
-        return flask.jsonify(**context), 200
+    context = {"likeid": existing_like['likeid'],
+               "url": "/api/v1/likes/" +
+               str(existing_like['likeid']) + '/'}
+    return flask.jsonify(**context), 200
 
 
 @insta485.app.route('/api/v1/likes/<likeid>/', methods=['DELETE'])
@@ -85,5 +84,4 @@ def delete_a_like(likeid):
             )
         connection.commit()
         return flask.jsonify(**context), 204
-    else:
-        return flask.jsonify(**context), 403
+    return flask.jsonify(**context), 403
