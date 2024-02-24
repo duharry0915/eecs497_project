@@ -4,7 +4,7 @@ import insta485
 from insta485.api.posts import http_auth
 
 
-@insta485.app.route('/api/v1/comments/', methods = ['POST'])
+@insta485.app.route('/api/v1/comments/', methods=['POST'])
 def add_a_comment():
     """Create one comment for a specific post. Return 201 on success."""
     connection = insta485.model.get_db()
@@ -20,7 +20,8 @@ def add_a_comment():
         context = {"message": "Not Found", "status_code": 404}
         return flask.jsonify(**context), 404
     if flask.request.authorization:
-        username, password, authentication = http_auth(connection, username, password, authentication)    
+        username, password, authentication = http_auth(
+            connection, username, password, authentication)
     if 'username' not in flask.session and not authentication:
         context = {"message": "Forbidden", "status_code": 403}
         return flask.jsonify(**context), 403
@@ -37,23 +38,26 @@ def add_a_comment():
     )
     new_inserted_comment_id = cur.fetchone()
     context = {"commentid": str(list(new_inserted_comment_id.values())[0]),
-            "lognameOwnsThis": True,
-            "owner": username,
-            "ownerShowUrl": "/users/" + username + '/',
-            "text": text,
-            "url": "/api/v1/comments/" + str(list(new_inserted_comment_id.values())[0]) + '/'}
+               "lognameOwnsThis": True,
+               "owner": username,
+               "ownerShowUrl": "/users/" + username + '/',
+               "text": text,
+               "url": "/api/v1/comments/" +
+               str(list(new_inserted_comment_id.values())[0]) + '/'}
     return flask.jsonify(**context), 201
 
-@insta485.app.route('/api/v1/comments/<commentid>/', methods = ['DELETE'])
+
+@insta485.app.route('/api/v1/comments/<commentid>/', methods=['DELETE'])
 def delete_a_comment(commentid):
     """Delete one comment."""
-    context= {}
-    connection= insta485.model.get_db()
+    context = {}
+    connection = insta485.model.get_db()
     authentication = None
     username = None
     password = None
     if flask.request.authorization:
-        username, password, authentication = http_auth(connection, username, password, authentication)    
+        username, password, authentication = http_auth(
+            connection, username, password, authentication)
     if 'username' not in flask.session and not authentication:
         context = {"message": "Forbidden", "status_code": 403}
         return flask.jsonify(**context), 403
@@ -77,4 +81,4 @@ def delete_a_comment(commentid):
         connection.commit()
         return flask.jsonify(**context), 204
     else:
-       return flask.jsonify(**context), 403
+        return flask.jsonify(**context), 403

@@ -3,12 +3,14 @@ import flask
 import insta485
 import hashlib
 
+
 def http_auth(connection, username, password, authentication):
+    """Http authentication."""
     username = flask.request.authorization['username']
     password = flask.request.authorization['password']
     user = connection.execute(
-    'SELECT password FROM users WHERE username == ?',
-    (username,)
+        'SELECT password FROM users WHERE username == ?',
+        (username,)
     ).fetchone()
     if not user:
         flask.abort(403)
@@ -23,8 +25,9 @@ def http_auth(connection, username, password, authentication):
         (username, password)
     ).fetchone()
     return username, password, authentication
-    
-@insta485.app.route('/api/v1/', methods = ['GET'])
+
+
+@insta485.app.route('/api/v1/', methods=['GET'])
 def get_list():
     """Return a list of services available."""
     context = {
@@ -35,7 +38,8 @@ def get_list():
     }
     return flask.jsonify(**context), 200
 
-@insta485.app.route('/api/v1/posts/', methods = ['GET'])
+
+@insta485.app.route('/api/v1/posts/', methods=['GET'])
 def get_10_posts():
     """Return the 10 newest posts."""
     connection = insta485.model.get_db()
@@ -43,7 +47,8 @@ def get_10_posts():
     username = None
     password = None
     if flask.request.authorization:
-        username, password, authentication = http_auth(connection, username, password, authentication)    
+        username, password, authentication = http_auth(
+            connection, username, password, authentication)
     if 'username' not in flask.session and not authentication:
         context = {"message": "Forbidden", "status_code": 403}
         return flask.jsonify(**context), 403
@@ -56,19 +61,19 @@ def get_10_posts():
         ORDER BY p.postid DESC;"""
     cur = connection.execute(query, (username, username))
     posts = cur.fetchall()
-    max_postid = flask.request.args.get('postid_lte', posts[0]["postid"], type=int)
+    max_postid = flask.request.args.get(
+        'postid_lte', posts[0]["postid"], type=int)
     size = flask.request.args.get('size', 10, type=int)
     page = flask.request.args.get('page', 0, type=int)
     if size <= 0 or page < 0:
         context = {"message": "Bad Request", "status_code": 400}
-        return flask.jsonify(**context), 400 
-
+        return flask.jsonify(**context), 400
 
     query = """
         SELECT p.postid
         FROM posts p
         WHERE (p.owner IN (SELECT username2 FROM following WHERE username1 = ?)
-        OR p.owner = ?) 
+        OR p.owner = ?)
     """
     params = [username, username]
     if max_postid:
@@ -78,7 +83,6 @@ def get_10_posts():
     params.extend([size, size * page])
     cur = connection.execute(query, params)
     posts = cur.fetchall()
-    base_url = "/api/v1/posts/"
     results = []
     for post in posts:
         results.append({
@@ -86,28 +90,25 @@ def get_10_posts():
             "url": "/api/v1/posts/" + str(post["postid"]) + "/"
         })
     add_on_url = "?"
-    add_on = False
     for key, value in flask.request.args.to_dict().items():
-        if(key, value):
-            add_on = True
         add_on_url += key
         add_on_url += '='
         add_on_url += value
         add_on_url += '&'
-    url = (base_url + add_on_url).rstrip('&')
-    if not add_on:
-        url = base_url
-    next_url = ''
+    url = ("/api/v1/posts/" + add_on_url).rstrip('&')
+    if add_on_url == "?":
+        url = "/api/v1/posts/"
+    add_on_url = ''
     if len(posts) >= size:
-        next_url = next_url + base_url + "?size=" + str(size) + "&page=" + str(page + 1) + "&postid_lte=" + str(max_postid)
-    context = {"next": next_url, "results": results, "url": url}
+        add_on_url += "/api/v1/posts/" + "?size=" + str(size) + "&page="
+        add_on_url += str(page + 1) + "&postid_lte=" + str(max_postid)
+    context = {"next": add_on_url, "results": results, "url": url}
     return flask.jsonify(**context)
 
 
-@insta485.app.route('/api/v1/posts/<int:postid_url_slug>/', methods = ['GET'])
+@insta485.app.route('/api/v1/posts/<int:postid_url_slug>/', methods=['GET'])
 def get_post(postid_url_slug):
     """Return post on postid."""
-    #Hard coded
     connection = insta485.model.get_db()
     cur = connection.execute(
         "SELECT * FROM posts ORDER BY postid DESC LIMIT 1"
@@ -120,7 +121,8 @@ def get_post(postid_url_slug):
     username = None
     password = None
     if flask.request.authorization:
-        username, password, authentication = http_auth(connection, username, password, authentication)    
+        username, password, authentication = http_auth(
+            connection, username, password, authentication)
     if 'username' not in flask.session and not authentication:
         context = {"message": "Forbidden", "status_code": 403}
         return flask.jsonify(**context), 403
@@ -188,9 +190,9 @@ def get_post(postid_url_slug):
         "url": like_url
     }
     context = {"comments": comm_results,
-               "comments_url": comments_url, 
+               "comments_url": comments_url,
                "created": created,
-               "imgUrl": img_url, 
+               "imgUrl": img_url,
                "likes": like_results,
                "owner": post['owner'],
                "ownerImgUrl": "/uploads/" + post_owner['filename'],
