@@ -14,11 +14,11 @@ import arrow
 import insta485
 
 
-@insta485.app.route("/", defaults={"path": ""})
-@insta485.app.route("/<path:path>")
-def catch_all(path):
-    """Serve the React frontend for any unknown routes."""
-    return flask.render_template("index.html")
+# @insta485.app.route("/", defaults={"path": ""})
+# @insta485.app.route("/<path:path>")
+# def catch_all(path):
+#     """Serve the React frontend for any unknown routes."""
+#     return flask.render_template("index.html")
 
 
 
@@ -29,214 +29,159 @@ def show_index():
         return flask.redirect(flask.url_for("show_login"))
 
     logname = flask.session['username']
-    # Connect to database
-    connection = insta485.model.get_db()
 
-    # Query database
-    print("logname")
-    cur = connection.execute(
-        "SELECT username, fullname, filename "
-        "FROM users "
-        "WHERE username != ?",
-        ("",)
-    )
-    users = cur.fetchall()
-
-    # Query for posts
-    sql_query = """
-        SELECT * FROM posts
-        WHERE owner = ?
-        OR owner IN (
-            SELECT username2 FROM following
-            WHERE username1 = ?
-        )
-        ORDER BY postid DESC
-    """
-    parameters = (logname, logname)
-
-    cur = connection.execute(sql_query, parameters)
-    posts = cur.fetchall()
-    for post in posts:
-        created_timestamp = post['created']
-        created_time = arrow.get(created_timestamp)
-        human_readable_time = created_time.humanize()
-        post['created'] = human_readable_time
-    # End query for posts
-
-    cur = connection.execute(
-        "SELECT * "
-        "FROM comments "
-        "WHERE owner != ? "
-        "ORDER BY created DESC",
-        ("",)
-    )
-    comments = cur.fetchall()
-
-    cur = connection.execute(
-        "SELECT * "
-        "FROM likes "
-        "WHERE owner != ?",
-        ("",)
-    )
-    likes = cur.fetchall()
-
-    # Add database info to context
-    context = {
-        "users": users, "logname": logname, "posts": posts,
-        "comments": comments, "likes": likes}
-
-    return flask.render_template("index.html", **context)
+    return flask.render_template("index.html")
 
 
-@insta485.app.route('/likes/', methods=['POST'])
-def like_or_unlike():
-    """Process like or unlike actions on posts."""
-    operation = flask.request.form['operation']
-    postid = flask.request.form['postid']
-    connection = insta485.model.get_db()
-    username = session['username']
-    target = request.args.get('target', '/')
-    if operation == 'like':
-        existing_like = connection.execute(
-            "SELECT * FROM likes WHERE owner = ? AND postid = ?",
-            (username, postid)
-            ).fetchone()
-        if existing_like is None:
-            connection.execute(
-                "INSERT INTO likes (owner, postid) VALUES (?, ?)",
-                (username, postid)
-                )
-        else:
-            flask.abort(409)
-    elif operation == 'unlike':
-        existing_unlike = connection.execute(
-            "SELECT * FROM likes WHERE owner = ? AND postid = ?",
-            (username, postid)
-        ).fetchone()
-        if existing_unlike is not None:
-            connection.execute(
-                "DELETE FROM likes WHERE owner = ? AND postid = ?",
-                (username, postid)
-                )
-        else:
-            flask.abort(409)
-    connection.commit()
-    return flask.redirect(target if target else flask.url_for("show_index"))
+# @insta485.app.route('/likes/', methods=['POST'])
+# def like_or_unlike():
+#     """Process like or unlike actions on posts."""
+#     operation = flask.request.form['operation']
+#     postid = flask.request.form['postid']
+#     connection = insta485.model.get_db()
+#     username = session['username']
+#     target = request.args.get('target', '/')
+#     if operation == 'like':
+#         existing_like = connection.execute(
+#             "SELECT * FROM likes WHERE owner = ? AND postid = ?",
+#             (username, postid)
+#             ).fetchone()
+#         if existing_like is None:
+#             connection.execute(
+#                 "INSERT INTO likes (owner, postid) VALUES (?, ?)",
+#                 (username, postid)
+#                 )
+#         else:
+#             flask.abort(409)
+#     elif operation == 'unlike':
+#         existing_unlike = connection.execute(
+#             "SELECT * FROM likes WHERE owner = ? AND postid = ?",
+#             (username, postid)
+#         ).fetchone()
+#         if existing_unlike is not None:
+#             connection.execute(
+#                 "DELETE FROM likes WHERE owner = ? AND postid = ?",
+#                 (username, postid)
+#                 )
+#         else:
+#             flask.abort(409)
+#     connection.commit()
+#     return flask.redirect(target if target else flask.url_for("show_index"))
 
 
-@insta485.app.route('/comments/', methods=['POST'])
-def add_comment():
-    """Add a comment to a post."""
-    # session['username'] = 'awdeorio'
-    operation = flask.request.form['operation']
-    username = session['username']
-    target = request.args.get('target', '/')
-    connection = insta485.model.get_db()
-    if operation == 'create':
-        text = flask.request.form['text']
-        postid = flask.request.form['postid']
-        if not text:
-            flask.abort(400)
-        else:
-            connection.execute(
-                "INSERT INTO comments (owner, postid, text) VALUES (?, ?, ?)",
-                (username, postid, text)
-            )
-    elif operation == 'delete':
-        commentid = flask.request.form['commentid']
-        comment_owner = connection.execute(
-            "SELECT owner FROM comments WHERE commentid = ? ",
-            (commentid, )
-        ).fetchone()
-        if comment_owner['owner'] == username:
-            connection.execute(
-                "DELETE FROM comments WHERE commentid = ?",
-                (commentid, )
-            )
-        else:
-            flask.abort(403)
-    connection.commit()
-    return flask.redirect(target if target else flask.url_for("show_index"))
+# @insta485.app.route('/comments/', methods=['POST'])
+# def add_comment():
+#     """Add a comment to a post."""
+#     # session['username'] = 'awdeorio'
+#     operation = flask.request.form['operation']
+#     username = session['username']
+#     target = request.args.get('target', '/')
+#     connection = insta485.model.get_db()
+#     if operation == 'create':
+#         text = flask.request.form['text']
+#         postid = flask.request.form['postid']
+#         if not text:
+#             flask.abort(400)
+#         else:
+#             connection.execute(
+#                 "INSERT INTO comments (owner, postid, text) VALUES (?, ?, ?)",
+#                 (username, postid, text)
+#             )
+#     elif operation == 'delete':
+#         commentid = flask.request.form['commentid']
+#         comment_owner = connection.execute(
+#             "SELECT owner FROM comments WHERE commentid = ? ",
+#             (commentid, )
+#         ).fetchone()
+#         if comment_owner['owner'] == username:
+#             connection.execute(
+#                 "DELETE FROM comments WHERE commentid = ?",
+#                 (commentid, )
+#             )
+#         else:
+#             flask.abort(403)
+#     connection.commit()
+#     return flask.redirect(target if target else flask.url_for("show_index"))
 
 
-@insta485.app.route('/posts/', methods=['POST'])
-def add_post():
-    """Add a new post."""
-    # session['username'] = 'awdeorio'
-    username = session['username']
-    operation = flask.request.form['operation']
-    target = request.args.get('target', None)
-    connection = insta485.model.get_db()
-    if operation == 'create':
-        fileobj = flask.request.files["file"]
-        filename = fileobj.filename
-        print(filename)
-        if not fileobj:
-            flask.abort(400)
-        else:
-            stem = uuid.uuid4().hex
-            suffix = pathlib.Path(filename).suffix.lower()
-            uuid_basename = f"{stem}{suffix}"
-            path = insta485.app.config["UPLOAD_FOLDER"]/uuid_basename
-            fileobj.save(path)
-            connection.execute(
-                "INSERT INTO posts (owner, filename) VALUES (?, ?)",
-                (username, uuid_basename)
-            )
-    elif operation == 'delete':
-        postid = flask.request.form['postid']
-        post = connection.execute(
-            "SELECT * FROM posts WHERE postid = ?",
-            (postid, )
-        ).fetchone()
-        if not post or post['owner'] != username:
-            flask.abort(403)
-        path = pathlib.Path(insta485.app.config["UPLOAD_FOLDER"]) \
-            / post['filename']
-        if path.exists():
-            path.unlink()
-        connection.execute(
-            "DELETE FROM posts WHERE postid = ?",
-            (postid, )
-            )
-    connection.commit()
-    return flask.redirect(
-        target if target else url_for("show_user", user_url_slug=username)
-        )
+# @insta485.app.route('/posts/', methods=['POST'])
+# def add_post():
+#     """Add a new post."""
+#     # session['username'] = 'awdeorio'
+#     username = session['username']
+#     operation = flask.request.form['operation']
+#     target = request.args.get('target', None)
+#     connection = insta485.model.get_db()
+#     if operation == 'create':
+#         fileobj = flask.request.files["file"]
+#         filename = fileobj.filename
+#         print(filename)
+#         if not fileobj:
+#             flask.abort(400)
+#         else:
+#             stem = uuid.uuid4().hex
+#             suffix = pathlib.Path(filename).suffix.lower()
+#             uuid_basename = f"{stem}{suffix}"
+#             path = insta485.app.config["UPLOAD_FOLDER"]/uuid_basename
+#             fileobj.save(path)
+#             connection.execute(
+#                 "INSERT INTO posts (owner, filename) VALUES (?, ?)",
+#                 (username, uuid_basename)
+#             )
+#     elif operation == 'delete':
+#         postid = flask.request.form['postid']
+#         post = connection.execute(
+#             "SELECT * FROM posts WHERE postid = ?",
+#             (postid, )
+#         ).fetchone()
+#         if not post or post['owner'] != username:
+#             flask.abort(403)
+#         path = pathlib.Path(insta485.app.config["UPLOAD_FOLDER"]) \
+#             / post['filename']
+#         if path.exists():
+#             path.unlink()
+#         connection.execute(
+#             "DELETE FROM posts WHERE postid = ?",
+#             (postid, )
+#             )
+#     connection.commit()
+#     return flask.redirect(
+#         target if target else url_for("show_user", user_url_slug=username)
+#         )
 
 
-@insta485.app.route('/following/', methods=['POST'])
-def follow_or_not():
-    """Toggle following status between users."""
-    # session['username'] = 'awdeorio'
-    operation = flask.request.form['operation']
-    username = flask.request.form['username']
-    logname = flask.session.get('username')
-    target = request.args.get('target', '/')
-    connection = insta485.model.get_db()
-    existing_relationship = connection.execute(
-        "SELECT * FROM following WHERE username1 = ? AND username2 = ?",
-        (logname, username)
-    ).fetchone()
+# @insta485.app.route('/following/', methods=['POST'])
+# def follow_or_not():
+#     """Toggle following status between users."""
+#     # session['username'] = 'awdeorio'
+#     operation = flask.request.form['operation']
+#     username = flask.request.form['username']
+#     logname = flask.session.get('username')
+#     target = request.args.get('target', '/')
+#     connection = insta485.model.get_db()
+#     existing_relationship = connection.execute(
+#         "SELECT * FROM following WHERE username1 = ? AND username2 = ?",
+#         (logname, username)
+#     ).fetchone()
 
-    if operation == 'follow':
-        if existing_relationship:
-            flask.abort(409)
-        else:
-            connection.execute(
-                "INSERT INTO following (username1, username2) VALUES (?, ?)",
-                (logname, username)
-            )
-    elif operation == 'unfollow':
-        if not existing_relationship:
-            flask.abort(409)
-        else:
-            connection.execute(
-                "DELETE FROM following WHERE username1 = ? AND username2 = ?",
-                (logname, username)
-            )
-    connection.commit()
-    return flask.redirect(target if target else flask.url_for("show_index"))
+#     if operation == 'follow':
+#         if existing_relationship:
+#             flask.abort(409)
+#         else:
+#             connection.execute(
+#                 "INSERT INTO following (username1, username2) VALUES (?, ?)",
+#                 (logname, username)
+#             )
+#     elif operation == 'unfollow':
+#         if not existing_relationship:
+#             flask.abort(409)
+#         else:
+#             connection.execute(
+#                 "DELETE FROM following WHERE username1 = ? AND username2 = ?",
+#                 (logname, username)
+#             )
+#     connection.commit()
+#     return flask.redirect(target if target else flask.url_for("show_index"))
 
 
 @insta485.app.route('/accounts/logout/', methods=['POST'])
@@ -291,7 +236,7 @@ def login():
     if not authentication:
         flask.abort(403)
     flask.session['username'] = username
-    return flask.redirect(target if target else flask.url_for("show_index"))
+    return flask.redirect(flask.url_for("show_index"))
 
 
 def func_delete():

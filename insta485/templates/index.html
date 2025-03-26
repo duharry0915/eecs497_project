@@ -9,6 +9,13 @@
     <div id="reactEntry">
         Loading...
     </div>
+    <form
+      action="/accounts/logout/"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <input type="submit" name="logout" value="Logout" />
+    </form>
 
     <!-- Load JavaScript -->
     <script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
