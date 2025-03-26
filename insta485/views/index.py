@@ -14,6 +14,14 @@ import arrow
 import insta485
 
 
+@insta485.app.route("/", defaults={"path": ""})
+@insta485.app.route("/<path:path>")
+def catch_all(path):
+    """Serve the React frontend for any unknown routes."""
+    return flask.render_template("index.html")
+
+
+
 @insta485.app.route('/')
 def show_index():
     """Display / route."""
