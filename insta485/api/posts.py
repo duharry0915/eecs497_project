@@ -36,6 +36,7 @@ def get_list():
         "posts": "/api/v1/posts/",
         "url": "/api/v1/"
     }
+    context = {}
     return flask.jsonify(**context), 200
 
 
@@ -103,6 +104,7 @@ def get_10_posts():
         add_on_url += "/api/v1/posts/" + "?size=" + str(size) + "&page="
         add_on_url += str(page + 1) + "&postid_lte=" + str(max_postid)
     context = {"next": add_on_url, "results": results, "url": url}
+    context = {"username": username}
     return flask.jsonify(**context)
 
 
@@ -200,4 +202,5 @@ def get_post(postid_url_slug):
                "postShowUrl": f"/posts/{postid_url_slug}/",
                "postid": postid_url_slug,
                "url": flask.request.path}
+    context = {}
     return flask.jsonify(**context)
