@@ -50,8 +50,21 @@ export default function Post({ url }) {
   }, []);
 
   return (
-    <div className="post">
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+    <div
+      className="post"
+      style={{
+        backgroundImage: `url('/static/assets/Viscontisforzatarot.jpg')`, // Replace with your image path
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <div style={{ textAlign: "center"}}>
+        <h4
+        style={{
+          backgroundColor: "#8B5CF6",
+          color: "white",
+        }}>Welcome, {username}!</h4> {/* Display the username at the top */}
         <button
           onClick={() => navigate("/tarot/shuffling")}
           style={{
@@ -72,7 +85,7 @@ export default function Post({ url }) {
         dataLength={posts.length}
         next={fetchPosts}
         hasMore={hasMore}
-        loader={<h4>Welcome, {username}!</h4>} // Display the username in the loader
+        loader={<h4></h4>}
         scrollThreshold={1}
       >
         {posts.map((post) => (

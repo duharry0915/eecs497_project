@@ -1,18 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>insta485</title>		
-	</head>
-	<body>
-    <p>{{"login"}}</p>
+<head>
+    <title>EECS497</title>
+    <style>
+        body {
+            background-image: url('/static/assets/Viscontisforzatarot.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        form {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="text"], input[type="password"], input[type="submit"] {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <p>{{"Login"}}</p>
     <form action="/accounts/?target=/" method="post" enctype="multipart/form-data">
         <p><input type="text" placeholder="username" name="username" required/></p>
         <p><input type="password" placeholder="password" name="password" required/></p>
         <p><input type="submit" value="login"/></p>
         <input type="hidden" name="operation" value="login"/>
     </form>
-
-        <p>{{"Don't have an account?"}}
-        <a href="/accounts/create/">{{"Sign up"}}</a></p>
-    </body>
+    <p>{{"Don't have an account?"}}
+    <a href="/accounts/create/">{{"Sign up"}}</a></p>
+</body>
 </html>
