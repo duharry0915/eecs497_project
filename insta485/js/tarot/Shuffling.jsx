@@ -13,6 +13,11 @@ export default function Shuffling() {
     }
   }, [shuffleMethod]);
 
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+  }, []);
+
   const handleShuffle = (method) => {
     setShuffleMethod(method);
     setShuffling(true);
@@ -59,7 +64,7 @@ const styles = {
   container: {
     textAlign: "center",
     color: "#000",
-    marginTop: "50px",
+    margin: 0,
     backgroundColor: "#f3e5f5",
     minHeight: "100vh",
     paddingTop: "20px",

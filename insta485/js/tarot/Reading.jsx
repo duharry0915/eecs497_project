@@ -80,7 +80,7 @@ const styles = {
   container: {
     textAlign: "center",
     color: "#000",
-    marginTop: "50px",
+    margin: 0,
     backgroundColor: "#f3e5f5",
     minHeight: "100vh",
     paddingTop: "20px",

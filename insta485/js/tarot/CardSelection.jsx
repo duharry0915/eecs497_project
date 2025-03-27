@@ -33,6 +33,11 @@ export default function CardSelection() {
   const [selectedCards, setSelectedCards] = useState([]);
   const [displayDeck, setDisplayDeck] = useState(baseCards);
 
+  useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+  }, []);
+
   /**
    * Each time we land on /tarot/selection, increment a shift counter in localStorage,
    * then shift the deck that many times.
@@ -107,7 +112,7 @@ const styles = {
   container: {
     textAlign: "center",
     color: "#000",
-    marginTop: "50px",
+    margin: 0,
     backgroundColor: "#f3e5f5",
     minHeight: "100vh",
     paddingTop: "20px",
