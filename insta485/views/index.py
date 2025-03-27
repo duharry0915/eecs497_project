@@ -29,6 +29,7 @@ def show_index():
         return flask.redirect(flask.url_for("show_login"))
 
     logname = flask.session['username']
+    #context = {"logname": logname}
 
     return flask.render_template("index.html")
 

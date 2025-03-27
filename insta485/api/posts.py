@@ -104,7 +104,7 @@ def get_10_posts():
         add_on_url += "/api/v1/posts/" + "?size=" + str(size) + "&page="
         add_on_url += str(page + 1) + "&postid_lte=" + str(max_postid)
     context = {"next": add_on_url, "results": results, "url": url}
-    context = {}
+    context = {"username": username}
     return flask.jsonify(**context)
 
 
