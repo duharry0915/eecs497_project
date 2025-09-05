@@ -389,3 +389,9 @@ def func_update():
     connection.commit()
     # connection.close()
     return flask.redirect(target)
+
+
+@insta485.app.route("/<path:path>")
+def catch_all(path):
+    """Serve the React frontend for any unknown routes."""
+    return flask.render_template("index.html")

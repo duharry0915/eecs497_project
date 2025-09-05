@@ -62,8 +62,7 @@ def get_10_posts():
         ORDER BY p.postid DESC;"""
     cur = connection.execute(query, (username, username))
     posts = cur.fetchall()
-    max_postid = flask.request.args.get(
-        'postid_lte', posts[0]["postid"], type=int)
+    max_postid = 1
     size = flask.request.args.get('size', 10, type=int)
     page = flask.request.args.get('page', 0, type=int)
     if size <= 0 or page < 0:

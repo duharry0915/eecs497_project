@@ -7,3 +7,6 @@ from insta485.api.likes import add_a_like
 from insta485.api.likes import delete_a_like
 from insta485.api.comments import add_a_comment
 from insta485.api.comments import delete_a_comment
+
+# Import music discovery API
+import insta485.api.discovery

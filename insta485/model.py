@@ -43,3 +43,81 @@ def close_db(error):
     if sqlite_db is not None:
         sqlite_db.commit()
         sqlite_db.close()
+
+
+# Music Discovery Platform Functions
+def get_trending_artists():
+    """Get trending artists based on social media growth."""
+    connection = get_db()
+    cur = connection.execute(
+        """
+        SELECT 
+            artist_id,
+            artist_name,
+            instagram_handle,
+            followers_count,
+            growth_rate,
+            genre,
+            breakout_score
+        FROM artists 
+        ORDER BY breakout_score DESC 
+        LIMIT 10
+        """
+    )
+    return cur.fetchall()
+
+
+def get_tastemakers():
+    """Get users identified as tastemakers based on early adopter behavior."""
+    connection = get_db()
+    cur = connection.execute(
+        """
+        SELECT 
+            user_id,
+            username,
+            influence_score,
+            early_adopter_score,
+            genres_followed
+        FROM tastemakers 
+        ORDER BY influence_score DESC 
+        LIMIT 10
+        """
+    )
+    return cur.fetchall()
+
+
+def get_trending_genres():
+    """Get trending genres based on social media activity."""
+    connection = get_db()
+    cur = connection.execute(
+        """
+        SELECT 
+            genre,
+            growth_rate,
+            artist_count,
+            trending_score
+        FROM genres 
+        ORDER BY trending_score DESC 
+        LIMIT 8
+        """
+    )
+    return cur.fetchall()
+
+
+def get_social_media_metrics(artist_id):
+    """Get social media metrics for a specific artist."""
+    connection = get_db()
+    cur = connection.execute(
+        """
+        SELECT 
+            platform,
+            followers_count,
+            engagement_rate,
+            growth_rate,
+            last_updated
+        FROM social_metrics 
+        WHERE artist_id = ?
+        """,
+        (artist_id,)
+    )
+    return cur.fetchall()
